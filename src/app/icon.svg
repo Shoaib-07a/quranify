@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Quranify favicon">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b473d"/>
+      <stop offset="58%" stop-color="#082f29"/>
+      <stop offset="100%" stop-color="#041513"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fff1bb"/>
+      <stop offset="42%" stop-color="#efc86d"/>
+      <stop offset="100%" stop-color="#a96c26"/>
+    </linearGradient>
+    <linearGradient id="page" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fff9ea"/>
+      <stop offset="100%" stop-color="#efd39c"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <pattern id="motif" width="28" height="28" patternUnits="userSpaceOnUse" patternTransform="scale(1.15)">
+      <path d="M14 2c0 6-6 12-12 12 6 0 12 6 12 12 0-6 6-12 12-12-6 0-12-6-12-12Z" fill="none" stroke="#174c42" stroke-width="1.2" opacity="0.32"/>
+    </pattern>
+  </defs>
+
+  <rect width="256" height="256" rx="58" fill="#000"/>
+  <g transform="translate(35 36)">
+    <rect x="0" y="0" width="186" height="184" rx="28" fill="url(#bg)" stroke="url(#gold)" stroke-width="3.5"/>
+    <rect x="0" y="0" width="186" height="184" rx="28" fill="url(#motif)" opacity="0.75"/>
+
+    <path d="M38 146V87c0-11 8-20 19-22 16-3 27-10 35-24 7-13 11-17 13-21 2 4 6 8 13 21 8 14 19 21 35 24 11 2 19 11 19 22v59"
+      fill="none" stroke="url(#gold)" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <g fill="url(#gold)" filter="url(#glow)">
+      <path d="M92 57c8 0 18 8 18 18 0 11-10 20-20 20-15 0-28-12-28-28 0-18 15-34 34-34-9 5-15 14-15 24 0 0 4-0 11 0Z"/>
+      <path d="M115 52l3 7 7 3-7 3-3 7-3-7-7-3 7-3Z"/>
+    </g>
+
+    <g fill="url(#gold)">
+      <rect x="53" y="86" width="7" height="36" rx="2"/>
+      <rect x="126" y="86" width="7" height="36" rx="2"/>
+      <rect x="55" y="79" width="3" height="7" rx="1"/>
+      <rect x="128" y="79" width="3" height="7" rx="1"/>
+      <path d="M49 79h15c-1-7-3-12-7.5-15-4.5 3-6.5 8-7.5 15Z"/>
+      <path d="M122 79h15c-1-7-3-12-7.5-15-4.5 3-6.5 8-7.5 15Z"/>
+      <path d="M84 112c0-17 10-29 22-36 12 7 22 19 22 36Z"/>
+      <path d="M89 112h34v17c0-6-6-12-10-15-5 3-7 7-7 15 0-8-3-12-7-15-4 3-10 9-10 15Z" opacity="0.95"/>
+      <path d="M104 73c2 0 4 2 4 4v5h-8v-5c0-2 2-4 4-4Z"/>
+      <path d="M100 73c0-2 2-4 4-4 2 0 4 2 4 4-1-1-2-2-4-2s-3 1-4 2Z"/>
+    </g>
+
+    <g transform="translate(19 115)">
+      <path d="M0 25 70 7c12-3 24-3 37 0l60 15-60 19c-10 3-20 3-30 0Z" fill="#07231f" opacity="0.45"/>
+      <path d="M12 12 73 0c11-2 21-2 31 0l52 11-58 18c-9 3-18 3-27 0Z" fill="url(#gold)"/>
+      <path d="M17 14 74 4c10-2 19-2 28 0l47 9-52 18c-8 3-16 3-24 0Z" fill="#0d3a33"/>
+
+      <path d="M17 14 74 4v44c-7-8-16-15-26-20-10-5-21-9-31-12Z" fill="url(#page)"/>
+      <path d="M149 13 102 4v44c7-8 16-15 25-20 9-5 19-9 22-11Z" fill="url(#page)"/>
+      <path d="M74 4c10-2 19-2 28 0v46c-5-6-9-11-14-15-5 4-9 9-14 15Z" fill="#e7c57c"/>
+
+      <path d="M31 20c12 2 24 5 36 11" fill="none" stroke="#edd9aa" stroke-width="1.8" opacity="0.7"/>
+      <path d="M118 31c8-6 16-9 22-11" fill="none" stroke="#edd9aa" stroke-width="1.8" opacity="0.7"/>
+    </g>
+  </g>
+</svg>
