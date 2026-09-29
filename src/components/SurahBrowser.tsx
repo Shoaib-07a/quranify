@@ -11,6 +11,8 @@ export interface SurahListItem {
   nameArabic: string;
   ayahCount: number;
   revelationType: string;
+  juzStart?: number | null;
+  revelationOrder?: number | null;
 }
 
 export default function SurahBrowser({
@@ -20,7 +22,7 @@ export default function SurahBrowser({
   surahs: SurahListItem[];
   basePath: "/quran" | "/tafseer";
 }) {
-  const { lastRead, hydrated } = useApp();
+  const { lastRead, hydrated, addRecentSurah } = useApp();
   const resume = hydrated ? lastRead : null;
   const [q, setQ] = useState("");
   const filtered = useMemo(() => {
@@ -59,6 +61,7 @@ export default function SurahBrowser({
             <li key={s.number}>
               <Link
                 href={isResume ? `${basePath}/${s.number}#ayah-${resume?.ayah ?? 1}` : `${basePath}/${s.number}`}
+                onClick={() => addRecentSurah(s.number)}
                 className="press card-flat group flex items-center gap-3.5 px-4 py-3.5"
               >
                 <span

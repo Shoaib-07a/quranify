@@ -60,38 +60,92 @@ export function ReaderSettings({ param }: { param: "tl" | "lang" }) {
 }
 
 export function FontSizeControl() {
-  const { settings, setArabicSize, hydrated } = useApp();
+  const { settings, setArabicSize, setTranslationSize, hydrated } = useApp();
   const size = hydrated ? settings.arabicSize : 30;
+  const tSize = hydrated ? settings.translationSize : 15;
+
   return (
-    <div
-      className="flex items-center gap-1.5 rounded-full border px-1.5 py-1"
-      style={{ borderColor: "var(--line)", background: "var(--surface)" }}
-      role="group"
-      aria-label="Arabic font size"
-    >
-      <button
-        type="button"
-        aria-label="Decrease Arabic font size"
-        className="press flex h-7 w-7 items-center justify-center rounded-full"
-        style={{ color: "var(--ink-soft)" }}
-        onClick={() => setArabicSize(Math.max(22, size - 2))}
-        disabled={size <= 22}
+    <div className="flex gap-2">
+      <div
+        className="flex items-center gap-1.5 rounded-full border px-1.5 py-1"
+        style={{ borderColor: "var(--line)", background: "var(--surface)" }}
+        role="group"
+        aria-label="Arabic font size"
       >
-        <Minus size={15} aria-hidden />
-      </button>
-      <span className="font-arabic px-0.5 text-[15px] leading-none" style={{ color: "var(--accent-ink)" }} aria-hidden>
-        ع
-      </span>
-      <button
-        type="button"
-        aria-label="Increase Arabic font size"
-        className="press flex h-7 w-7 items-center justify-center rounded-full"
-        style={{ color: "var(--ink-soft)" }}
-        onClick={() => setArabicSize(Math.min(48, size + 2))}
-        disabled={size >= 48}
+        <button
+          type="button"
+          aria-label="Decrease Arabic font size"
+          className="press flex h-7 w-7 items-center justify-center rounded-full"
+          style={{ color: "var(--ink-soft)" }}
+          onClick={() => setArabicSize(Math.max(22, size - 2))}
+          disabled={size <= 22}
+        >
+          <Minus size={13} aria-hidden />
+        </button>
+        <span className="font-arabic px-0.5 text-[14px] leading-none text-muted" aria-hidden>
+          ع
+        </span>
+        <button
+          type="button"
+          aria-label="Increase Arabic font size"
+          className="press flex h-7 w-7 items-center justify-center rounded-full"
+          style={{ color: "var(--ink-soft)" }}
+          onClick={() => setArabicSize(Math.min(48, size + 2))}
+          disabled={size >= 48}
+        >
+          <Plus size={13} aria-hidden />
+        </button>
+      </div>
+
+      <div
+        className="flex items-center gap-1.5 rounded-full border px-1.5 py-1"
+        style={{ borderColor: "var(--line)", background: "var(--surface)" }}
+        role="group"
+        aria-label="Translation font size"
       >
-        <Plus size={15} aria-hidden />
-      </button>
+        <button
+          type="button"
+          className="press flex h-7 w-7 items-center justify-center rounded-full"
+          style={{ color: "var(--ink-soft)" }}
+          onClick={() => setTranslationSize(Math.max(12, tSize - 1))}
+          disabled={tSize <= 12}
+        >
+          <Minus size={13} aria-hidden />
+        </button>
+        <span className="px-0.5 text-[11px] font-bold text-muted uppercase" aria-hidden>
+          Tr
+        </span>
+        <button
+          type="button"
+          className="press flex h-7 w-7 items-center justify-center rounded-full"
+          style={{ color: "var(--ink-soft)" }}
+          onClick={() => setTranslationSize(Math.min(24, tSize + 1))}
+          disabled={tSize >= 24}
+        >
+          <Plus size={13} aria-hidden />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export function ReciterSelector() {
+  const { settings, setReciter, hydrated } = useApp();
+  if (!hydrated) return null;
+
+  return (
+    <div className="seg" role="group" aria-label="Reciter selection">
+      {RECITERS.map((r) => (
+        <button
+          key={r.id}
+          type="button"
+          data-active={settings.reciter === r.id}
+          onClick={() => setReciter(r.id)}
+          className="text-[11px] font-bold"
+        >
+          {r.name}
+        </button>
+      ))}
     </div>
   );
 }
@@ -131,13 +185,24 @@ export function LastReadTracker({
 
 type AudioState = "idle" | "playing" | "paused" | "error";
 
+const RECITERS = [
+  { id: "ar.alafasy", name: "Alafasy" },
+  { id: "ar.husary", name: "Husary" },
+  { id: "ar.minshawi", name: "Minshawi" },
+];
+
 export function AyahAudioButton({ globalId, label }: { globalId: number; label: string }) {
+  const { settings } = useApp();
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [state, setState] = useState<AudioState>("idle");
 
   const toggle = async () => {
-    if (!audioRef.current) {
-      const el = new Audio(`https://cdn.islamic.network/quran/audio/128/ar.alafasy/${globalId}.mp3`);
+    const reciterId = settings.reciter || "ar.alafasy";
+    const src = `https://cdn.islamic.network/quran/audio/128/${reciterId}/${globalId}.mp3`;
+
+    if (!audioRef.current || audioRef.current.src !== src) {
+      if (audioRef.current) audioRef.current.pause();
+      const el = new Audio(src);
       el.addEventListener("ended", () => setState("idle"));
       el.addEventListener("error", () => setState("error"));
       el.addEventListener("playing", () => setState("playing"));
@@ -146,6 +211,7 @@ export function AyahAudioButton({ globalId, label }: { globalId: number; label: 
       });
       audioRef.current = el;
     }
+    
     const el = audioRef.current;
     if (state === "playing") {
       el.pause();

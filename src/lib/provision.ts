@@ -20,7 +20,10 @@ create table if not exists surahs (
   name_arabic text not null,
   name_english text not null,
   ayah_count integer not null,
-  revelation_type text not null
+  revelation_type text not null,
+  revelation_order integer,
+  juz_start integer,
+  introduction text
 );
 create table if not exists ayahs (
   id serial primary key,
@@ -127,6 +130,14 @@ create table if not exists allah_names (
   reference text,
   source text not null
 );
+create table if not exists ayah_notes (
+  id serial primary key,
+  surah_number integer not null,
+  ayah_number integer not null,
+  note text not null,
+  created_at bigint not null
+);
+create index if not exists ayah_notes_lookup_idx on ayah_notes(surah_number, ayah_number);
 create table if not exists content_meta (
   key text primary key,
   value text not null

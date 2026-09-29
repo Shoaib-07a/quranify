@@ -8,6 +8,7 @@ import { useApp, type LangCode, type ThemeMode } from "@/lib/store";
 const THEME_OPTIONS: Array<{ value: ThemeMode; label: string; Icon: typeof Sun }> = [
   { value: "light", label: "Light", Icon: Sun },
   { value: "dark", label: "Dark", Icon: Moon },
+  { value: "sepia", label: "Sepia", Icon: Sun }, // Could use a different icon if available
   { value: "system", label: "Auto", Icon: Monitor },
 ];
 
@@ -59,6 +60,7 @@ export default function SettingsClient() {
     hydrated,
     setTheme,
     setArabicSize,
+    setTranslationSize,
     setLang,
     clearLocalData,
   } = useApp();
@@ -127,6 +129,29 @@ export default function SettingsClient() {
             >
               بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
             </p>
+          </div>
+
+          <div className="mt-4 border-t pt-5" style={{ borderColor: "var(--line)" }}>
+            <div className="flex items-center justify-between">
+              <p className="text-[14.5px] font-bold">Translation font size</p>
+              <span className="rounded-full px-2.5 py-0.5 text-[11.5px] font-bold tabular-nums" style={{ background: "var(--accent-soft)", color: "var(--accent-ink)" }}>
+                {settings.translationSize}px
+              </span>
+            </div>
+            <input
+              type="range"
+              min={12}
+              max={24}
+              step={1}
+              value={settings.translationSize}
+              aria-label="Translation font size"
+              className="q-range mt-3"
+              style={{
+                // @ts-expect-error CSS var for fill
+                "--fill": `${((settings.translationSize - 12) / 12) * 100}%`,
+              }}
+              onChange={(e) => setTranslationSize(Number(e.target.value))}
+            />
           </div>
 
           <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-4" style={{ borderColor: "var(--line)" }}>

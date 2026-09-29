@@ -3,14 +3,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Chip, PageHeader, SourceTag } from "@/components/ui";
-import { BookmarkButton, TextActions } from "@/components/interactions";
+import { BookmarkButton, TextActions, NoteButton } from "@/components/interactions";
 import {
   AyahAudioButton,
   FontSizeControl,
   LastReadTracker,
   ReaderSettings,
+  ReciterSelector,
 } from "@/components/ReaderChrome";
 import { getAyahsWithTranslation, getSurah, getSurahs, type LangCode } from "@/lib/queries";
+import { getNotesForSurah } from "@/app/actions/notes";
 
 export const dynamic = "force-dynamic";
 
@@ -45,10 +47,11 @@ export default async function SurahReaderPage({
   const langParam = typeof sp.tl === "string" ? (sp.tl as LangCode) : "en";
   const lang: LangCode = LANGS.includes(langParam) ? langParam : "en";
 
-  const [meta, rows, all] = await Promise.all([
+  const [meta, rows, all, notes] = await Promise.all([
     getSurah(n),
     getAyahsWithTranslation(n, lang),
     getSurahs(),
+    getNotesForSurah(n),
   ]);
   if (!meta) notFound();
 
@@ -85,8 +88,9 @@ export default async function SurahReaderPage({
         </div>
       </section>
 
-      <div className="mb-5 flex items-center justify-center">
+      <div className="mb-5 flex flex-col items-center gap-3">
         <ReaderSettings param="tl" />
+        <ReciterSelector />
       </div>
 
       {/* Bismillah (not part of At-Tawbah; Al-Fatihah already includes it as ayah 1) */}
@@ -110,6 +114,11 @@ export default async function SurahReaderPage({
                   </span>
                   <div className="flex items-center gap-2">
                     <AyahAudioButton globalId={globalId} label={`ayah ${a.ayahNumber} of Surah ${meta.nameEnglish}`} />
+                    <NoteButton
+                      surah={meta.number}
+                      ayah={a.ayahNumber}
+                      initial={notes.find((n) => n.ayahNumber === a.ayahNumber)?.note}
+                    />
                     <BookmarkButton
                       id={`ayah:${a.surahNumber}:${a.ayahNumber}`}
                       type="ayah"
@@ -125,10 +134,15 @@ export default async function SurahReaderPage({
                 </p>
                 {a.translation ? (
                   <p
-                    className={`mt-4 border-t pt-4 ${lang === "ur" ? "font-urdu text-right text-[16.5px]" : lang === "hi" ? "font-hindi text-[16.5px] leading-[2]" : "text-[15px] leading-relaxed"}`}
+                    className={`mt-4 border-t pt-4 ${lang === "ur" ? "font-urdu text-right" : lang === "hi" ? "font-hindi" : "leading-relaxed"}`}
                     dir={lang === "ur" ? "rtl" : "ltr"}
                     lang={lang === "ur" ? "ur" : lang === "hi" ? "hi" : "en"}
-                    style={{ borderColor: "var(--line)", color: "var(--ink-soft)" }}
+                    style={{
+                      borderColor: "var(--line)",
+                      color: "var(--ink-soft)",
+                      fontSize: "var(--reader-tr-size, 15px)",
+                      lineHeight: lang === "hi" ? "2" : "1.7",
+                    }}
                   >
                     {a.translation}
                   </p>

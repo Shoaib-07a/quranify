@@ -65,7 +65,7 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-const bootScript = `(function(){try{var s=JSON.parse(localStorage.getItem("quranify.settings")||"{}");var d=s.theme==="dark"||((!s.theme||s.theme==="system")&&window.matchMedia("(prefers-color-scheme: dark)").matches);if(d)document.documentElement.classList.add("dark");if(s.arabicSize)document.documentElement.style.setProperty("--reader-ar-size",s.arabicSize+"px");}catch(e){}})();`;
+const bootScript = `(function(){try{var s=JSON.parse(localStorage.getItem("quranify.settings")||"{}");var d=s.theme==="dark"||((!s.theme||s.theme==="system")&&window.matchMedia("(prefers-color-scheme: dark)").matches);if(d)document.documentElement.classList.add("dark");if(s.theme==="sepia")document.documentElement.classList.add("sepia");if(s.arabicSize)document.documentElement.style.setProperty("--reader-ar-size",s.arabicSize+"px");if(s.translationSize)document.documentElement.style.setProperty("--reader-tr-size",s.translationSize+"px");}catch(e){}})();`;
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   // Self-heal the content database in the background if it was reset.

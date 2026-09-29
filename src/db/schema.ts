@@ -23,7 +23,20 @@ export const surahs = pgTable("surahs", {
   nameEnglish: text("name_english").notNull(),
   ayahCount: integer("ayah_count").notNull(),
   revelationType: text("revelation_type").notNull(), // "makki" | "madani"
+  revelationOrder: integer("revelation_order"),
+  juzStart: integer("juz_start"),
+  introduction: text("introduction"),
 });
+
+export const ayahNotes = pgTable("ayah_notes", {
+  id: serial("id").primaryKey(),
+  surahNumber: integer("surah_number").notNull(),
+  ayahNumber: integer("ayah_number").notNull(),
+  note: text("note").notNull(),
+  createdAt: bigint("created_at", { mode: "number" }).notNull(),
+}, (t) => [
+  index("ayah_notes_lookup_idx").on(t.surahNumber, t.ayahNumber),
+]);
 
 export const ayahs = pgTable(
   "ayahs",

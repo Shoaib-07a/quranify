@@ -10,28 +10,25 @@ import {
   type ReactNode,
 } from "react";
 
-export type ThemeMode = "light" | "dark" | "system";
+export type ThemeMode = "light" | "dark" | "system" | "sepia";
 export type LangCode = "en" | "ur" | "hi";
 
 export interface Settings {
   theme: ThemeMode;
   arabicSize: number;
-  /** Single unified content language — translation AND tafseer follow it. */
+  translationSize: number;
   lang: LangCode;
+  reciter: string; // alafasy, husary, minshawi
 }
 
-export type BookmarkType =
-  | "ayah"
-  | "tafseer"
-  | "hadith"
-  | "dua"
-  | "dhikr"
-  | "name";
+export type BookmarkType = "ayah" | "tafseer" | "hadith" | "dua" | "dhikr" | "name";
+export type BookmarkCategory = "Favorites" | "Dua" | "Important" | "Personal" | "General";
 
 export interface Bookmark {
   id: string;
   type: BookmarkType;
-  ref: string; // route path
+  category: BookmarkCategory;
+  ref: string;
   title: string;
   subtitle?: string;
   createdAt: number;
@@ -44,6 +41,12 @@ export interface LastRead {
   at: number;
 }
 
+export interface AyahNote {
+  surah: number;
+  ayah: number;
+  text: string;
+}
+
 const SETTINGS_KEY = "quranify.settings";
 const BOOKMARKS_KEY = "quranify.bookmarks";
 const LASTREAD_KEY = "quranify.lastread";
@@ -51,25 +54,33 @@ const LASTREAD_KEY = "quranify.lastread";
 const defaultSettings: Settings = {
   theme: "system",
   arabicSize: 30,
+  translationSize: 15,
   lang: "en",
+  reciter: "alafasy",
 };
 
 interface AppState {
   settings: Settings;
   bookmarks: Bookmark[];
   lastRead: LastRead | null;
+  recentSurahs: number[];
   hydrated: boolean;
   setTheme: (t: ThemeMode) => void;
   setArabicSize: (n: number) => void;
+  setTranslationSize: (n: number) => void;
   setLang: (l: LangCode) => void;
+  setReciter: (r: string) => void;
   toggleBookmark: (b: Omit<Bookmark, "createdAt">) => void;
   removeBookmark: (id: string) => void;
   isBookmarked: (id: string) => boolean;
   setLastRead: (r: LastRead) => void;
+  addRecentSurah: (n: number) => void;
   clearLocalData: () => void;
 }
 
 const AppContext = createContext<AppState | null>(null);
+
+const RECENT_KEY = "quranify.recent";
 
 function applyTheme(theme: ThemeMode) {
   const dark =
@@ -78,6 +89,7 @@ function applyTheme(theme: ThemeMode) {
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-color-scheme: dark)").matches);
   document.documentElement.classList.toggle("dark", dark);
+  document.documentElement.classList.toggle("sepia", theme === "sepia");
 }
 
 function applyArabicSize(size: number) {
@@ -88,22 +100,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<Settings>(defaultSettings);
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [lastRead, setLastReadState] = useState<LastRead | null>(null);
+  const [recentSurahs, setRecentSurahs] = useState<number[]>([]);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     try {
       const s = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "null");
-      if (s) {
-        // Migrate the previous split quranLang/tafseerLang keys into one.
-        const legacy = (s.quranLang ?? s.tafseerLang ?? "en") as LangCode;
-        const lang: LangCode = ["en", "ur", "hi"].includes(s.lang) ? s.lang : legacy;
-        setSettings({
-          ...defaultSettings,
-          theme: s.theme ?? defaultSettings.theme,
-          arabicSize: typeof s.arabicSize === "number" ? s.arabicSize : defaultSettings.arabicSize,
-          lang,
-        });
-      }
+      if (s) setSettings({ ...defaultSettings, ...s });
     } catch {}
     try {
       const b = JSON.parse(localStorage.getItem(BOOKMARKS_KEY) || "[]");
@@ -112,6 +115,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     try {
       const r = JSON.parse(localStorage.getItem(LASTREAD_KEY) || "null");
       if (r) setLastReadState(r);
+    } catch {}
+    try {
+      const rc = JSON.parse(localStorage.getItem(RECENT_KEY) || "[]");
+      if (Array.isArray(rc)) setRecentSurahs(rc);
     } catch {}
     setHydrated(true);
 
@@ -144,6 +151,25 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const setLang = useCallback(
     (lang: LangCode) => persistSettings({ ...settings, lang }),
     [settings, persistSettings],
+  );
+  const setTranslationSize = useCallback(
+    (translationSize: number) => persistSettings({ ...settings, translationSize }),
+    [settings, persistSettings],
+  );
+  const setReciter = useCallback(
+    (reciter: string) => persistSettings({ ...settings, reciter }),
+    [settings, persistSettings],
+  );
+
+  const addRecentSurah = useCallback(
+    (n: number) => {
+      const next = [n, ...recentSurahs.filter((x) => x !== n)].slice(0, 10);
+      setRecentSurahs(next);
+      try {
+        localStorage.setItem(RECENT_KEY, JSON.stringify(next));
+      } catch {}
+    },
+    [recentSurahs],
   );
 
   const persistBookmarks = useCallback((next: Bookmark[]) => {
@@ -196,28 +222,36 @@ export function AppProvider({ children }: { children: ReactNode }) {
       settings,
       bookmarks,
       lastRead,
+      recentSurahs,
       hydrated,
       setTheme,
       setArabicSize,
+      setTranslationSize,
       setLang,
+      setReciter,
       toggleBookmark,
       removeBookmark,
       isBookmarked,
       setLastRead,
+      addRecentSurah,
       clearLocalData,
     }),
     [
       settings,
       bookmarks,
       lastRead,
+      recentSurahs,
       hydrated,
       setTheme,
       setArabicSize,
+      setTranslationSize,
       setLang,
+      setReciter,
       toggleBookmark,
       removeBookmark,
       isBookmarked,
       setLastRead,
+      addRecentSurah,
       clearLocalData,
     ],
   );

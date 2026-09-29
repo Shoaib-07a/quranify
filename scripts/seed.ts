@@ -106,13 +106,28 @@ async function seedQuran() {
     verses: Array<{ id: number; text: string }>;
   }>;
 
-  const surahRows = data.map((s) => ({
-    number: Number(s.id),
-    nameArabic: s.name,
-    nameEnglish: s.transliteration,
-    ayahCount: Number(s.total_verses),
-    revelationType: s.type === "meccan" ? "makki" : "madani",
-  }));
+  console.log("• Fetching surah metadata (revelation order, juz, etc)…");
+  const metaJson = await fetchJson("https://api.alquran.cloud/v1/meta");
+  const surahMeta = metaJson?.data?.surahs?.references ?? [];
+  const metaMap = new Map<number, any>();
+  for (const m of surahMeta) {
+    metaMap.set(Number(m.number), m);
+  }
+
+  const surahRows = data.map((s) => {
+    const num = Number(s.id);
+    const m = metaMap.get(num);
+    return {
+      number: num,
+      nameArabic: s.name,
+      nameEnglish: s.transliteration,
+      ayahCount: Number(s.total_verses),
+      revelationType: s.type === "meccan" ? "makki" : "madani",
+      revelationOrder: m?.revelationOrder ?? null,
+      juzStart: m?.juz ?? null,
+      introduction: null, // Would require a separate dataset, keeping null for now
+    };
+  });
   await db.insert(surahs).values(surahRows);
   console.log(`   surahs: ${surahRows.length}`);
 

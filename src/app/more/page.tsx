@@ -9,6 +9,7 @@ import {
   Settings,
   Sparkles,
   Star,
+  BookOpen,
 } from "lucide-react";
 import { PageHeader } from "@/components/ui";
 
@@ -24,6 +25,12 @@ const DESTINATIONS: Array<{
   arabic?: string;
   desc: string;
 }> = [
+  {
+    href: "/plans",
+    icon: BookOpen,
+    title: "Reading Plans",
+    desc: "Set a goal to complete the Quran in 7, 15 or 30 days",
+  },
   {
     href: "/duas",
     icon: HandHeart,
