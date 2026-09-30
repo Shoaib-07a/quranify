@@ -71,7 +71,11 @@ export default async function TafseerReaderPage({
   const translator = rows.find((r) => r.translator)?.translator ?? null;
 console.log(
   "TAFSIR CHECK",
-  rows.filter((r) => [37, 38, 39].includes(r.ayahNumber))
+  JSON.stringify(
+    rows.filter((r) => [37, 38, 39].includes(r.ayahNumber)),
+    null,
+    2
+  )
 );
   return (
     <div className="px-5">
