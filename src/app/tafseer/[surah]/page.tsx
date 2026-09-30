@@ -69,7 +69,10 @@ export default async function TafseerReaderPage({
   const next = all.find((s) => s.number === n + 1);
   const tafsirSource = rows.find((r) => r.tafsirSource)?.tafsirSource ?? null;
   const translator = rows.find((r) => r.translator)?.translator ?? null;
-
+console.log(
+  "TAFSIR CHECK",
+  rows.filter((r) => [37, 38, 39].includes(r.ayahNumber))
+);
   return (
     <div className="px-5">
       <PageHeader
